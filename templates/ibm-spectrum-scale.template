@@ -47,7 +47,6 @@
                         "default": "Network Configuration:"
                     },
                     "Parameters": [
-                        "AvailabilityZones",
                         "VpcId",
                         "PrivateSubnet1ID",
                         "PrivateSubnet2ID"
@@ -55,7 +54,7 @@
                 },
                 {
                     "Label": {
-                        "default": "AWS Quick Start Configuration:"
+                        "default": "Amazon EC2 Configuration:"
                     },
                     "Parameters": [
                         "KeyPairName",
@@ -105,9 +104,6 @@
                 "ServerNodeCount": {
                     "default": "Server Node Count"
                 },
-                "AvailabilityZones": {
-                    "default": "Availability Zone"
-                },
                 "ServerInstanceType": {
                     "default": "Server Instance Type"
                 },
@@ -124,10 +120,10 @@
                     "default": "Bastion Security Group ID"
                 },
                 "PrivateSubnet1ID": {
-                    "default": "Private Subnets 1 ID"
+                    "default": "Private Subnet 1 ID"
                 },
                 "PrivateSubnet2ID": {
-                    "default": "Private Subnets 2 ID"
+                    "default": "Private Subnet 2 ID"
                 },
                 "KeyPairName": {
                     "default": "Key Pair Name"
@@ -146,15 +142,15 @@
             "AllowedValues": [
                 "Accept"
             ],
-            "Description": "LICENSE INFORMATION: Details License Information can be found in: http://spectrumscale-license.s3-website-us-west-2.amazonaws.com.",
+            "Description": "Review the licensing terms at http://spectrumscale-license.s3-website-us-west-2.amazonaws.com and choose Accept to indicate your acceptance.",
             "Type": "String"
         },
         "BastionSecurityGroupID": {
-    	    "Description": "ID of the bastion host security group id to enable SSH connections (e.g. sg-5f16e910).",
+            "Description": "ID of the bastion host security group id to enable SSH connections (e.g. sg-5f16e910).",
             "Type": "AWS::EC2::SecurityGroup::Id",
             "MinLength": "1",
             "ConstraintDescription": "Must be a valid bastion host security group id (e.g. sg-5f16e910)."
-       },
+        },
         "BlockSize": {
             "Description": "File system block size.",
             "Type": "String",
@@ -170,7 +166,7 @@
             ]
         },
         "DataReplica": {
-            "Description": "Number of replica copies of data and metadata across the all cluster nodes on two AZs.",
+            "Description": "Number of replica copies of data across the all cluster nodes on two AZs.",
             "Type": "Number",
             "Default": "2",
             "AllowedValues": [
@@ -307,14 +303,14 @@
         },
         "ComputeNodeCount": {
             "Default": "2",
-            "Description": "Number of Compute node instances (MIN=1, MAX=64).",
+            "Description": "Number of IBM Spectrum Scale compute node instances. You can select 1-64 instances.",
             "Type": "Number",
             "MinValue": "1",
             "MaxValue": "64",
             "ConstraintDescription": "Compute node size must be between 1 to 64."
         },
         "ComputeInstanceType": {
-            "Description": "Instance type to use for the Compute node instances.",
+            "Description": "Instance type to use for the compute node instances.",
             "Type": "String",
             "Default": "t2.micro",
             "AllowedValues": [
@@ -388,7 +384,7 @@
             "ConstraintDescription": "Must be a valid email address."
         },
         "SpectrumS3Bucket": {
-            "Description": "Important: Enter name of a personally owned/created S3 bucket to be used for data store and SSH key synchronization between nodes. If there is no pre-existing S3 bucket to re-use, create a new S3 bucket before launching this quick start.",
+            "Description": "The name of the S3 bucket to be used for data store and SSH key synchronization between nodes. If you don’t have an existing S3 bucket to reuse, you must create a new S3 bucket before launching this Quick Start.",
             "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
             "Type": "String",
             "MinLength": "1",
@@ -924,7 +920,7 @@
                                             "fi\n",
                                             "\n",
                                             "RUNNING=False\n",
-                                            "ec2-describe-instances --filter instance.group-id=$ServerSG | grep INSTANCE | awk '{print $2,$4,$5,$9,$10,$12}' > /var/log/instance_server.out\n",    
+                                            "ec2-describe-instances --filter instance.group-id=$ServerSG | grep INSTANCE | awk '{print $2,$4,$5,$9,$10,$12}' > /var/log/instance_server.out\n",
                                             "sleep $wait\n",
                                             "ec2-describe-instances --filter instance.group-id=$ComputeSG | grep INSTANCE | awk '{print $2,$4,$5,$9,$10,$12}' > /var/log/instance_compute.out\n",
                                             "SerNodeCount=$(cat /var/log/instance_server.out | grep running | wc -l)\n",
@@ -1351,7 +1347,7 @@
                                             },
                                             "\n",
                                             "echo DataReplica $DataReplica\n",
-                                            "MetadataReplica=$DataReplica\n",
+                                            "MetadataReplica=2\n",
                                             "\n",
                                             "echo MetadataReplica $MetadataReplica\n",
                                             "FsName=fs1\n",
@@ -1511,12 +1507,7 @@
                                             "       chmod 755 /var/log/nsdFile\n",
                                             "       echo Create GPFS NSD..\n",
                                             "       sed -i \"s/FG_${AZ}/1/\" /var/log/nsdFile\n",
-                                            "       if [ ${DataReplica} == 2 ]\n",
-                                            "       then\n",
-                                            "           sed -i \"s/FG_../2/\" /var/log/nsdFile\n",
-                                            "       else\n",
-                                            "           sed -i \"s/FG_../1/\" /var/log/nsdFile\n",
-                                            "       fi\n",
+                                            "       sed -i \"s/FG_../2/\" /var/log/nsdFile\n",
                                             "       echo copying updated nsdFile file to admin node...\n",
                                             "       scp /var/log/nsdFile ${adminNode}:/var/log/nsdFile\n",
                                             "       /usr/lpp/mmfs/bin/mmcrnsd -F /var/log/nsdFile\n",
@@ -1632,7 +1623,7 @@
                                             },
                                             "\n",
                                             "echo DataReplica $DataReplica\n",
-                                            "MetadataReplica=$DataReplica",
+                                            "MetadataReplica=2",
                                             "\n",
                                             "echo MetadataReplica $MetadataReplica\n",
                                             "\n",
@@ -1899,7 +1890,6 @@
                                             },
                                             "\n",
                                             "echo ReplaceUnhealthy process suspended from compute autoscaling group\n"
-                                            
                                         ]
                                     ]
                                 }
@@ -1932,15 +1922,15 @@
                                             },
                                             "\n",
                                             "echo Fs1 fileSystem successfully mounted..\n"
-                                         ]
-                                       ]
-                                    }
-                                },
-                                "10_gpfs_verifications": {
+                                        ]
+                                    ]
+                                }
+                            },
+                            "10_gpfs_verifications": {
                                 "command": {
                                     "Fn::Join": [
                                         "",
-                                        [     
+                                        [
                                             "echo ----Lets do some verification test---\n",
                                             "/usr/lpp/mmfs/bin/mmgetstate -a",
                                             "\n",
@@ -1981,7 +1971,9 @@
                     {
                         "DeviceName": "/dev/sda1",
                         "Ebs": {
-                            "VolumeSize": { "Ref": "DiskSize" },
+                            "VolumeSize": {
+                                "Ref": "DiskSize"
+                            },
                             "VolumeType": "gp2"
                         }
                     }
@@ -2579,7 +2571,9 @@
                     {
                         "DeviceName": "/dev/sda1",
                         "Ebs": {
-                            "VolumeSize": { "Ref": "DiskSize" },
+                            "VolumeSize": {
+                                "Ref": "DiskSize"
+                            },
                             "VolumeType": "gp2"
                         }
                     }
