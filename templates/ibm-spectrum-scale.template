@@ -2347,7 +2347,7 @@
                                                 "Ref": "ServerNodeCount"
                                             },
                                             "\n",
-                                            "MetadataReplica=$DataReplica\n",
+                                            "MetadataReplica=2\n",
                                             "echo Generate GPFS cluster node file\n",
                                             "rm /var/log/nsdFile\n",
                                             "touch /var/log/nsdFile\n",
